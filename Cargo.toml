@@ -1,6 +1,7 @@
 [package]
 name = "ncr-crypto"
 description = "A library for the cryptography used in the Minecraft No-Chat-Reports Mod"
+license = "MIT"
 version = "0.1.0"
 edition = "2021"
 
