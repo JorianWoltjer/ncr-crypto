@@ -1,0 +1,18 @@
+[package]
+name = "ncr-crypto"
+description = "A library for the cryptography used in the Minecraft No-Chat-Reports Mod"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bytes = "1"
+getrandom = "0.2"
+java-rand = "0.2"
+fastpbkdf2 = "0.1"
+base64 = "0.13"
+aes = "0.8"
+cfb8 = "0.8"
+tqdm = "0.4"
+bruteforce = "0.2"
