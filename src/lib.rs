@@ -262,7 +262,7 @@ impl Display for FormatError {
 /// assert_eq!(decoded, Err(FormatError));
 /// ```
 pub fn decode_and_verify(bytes: &[u8]) -> Result<&str, FormatError> {
-    if bytes[..2] != [35, 37] {  // "#%"
+    if bytes.len() < 2 || bytes[..2] != [35, 37] {  // "#%"
         return Err(FormatError)
     }
 
