@@ -13,9 +13,9 @@ aes = "0.8"
 bruteforce = "0.2"
 bytes = "1"
 cfb8 = "0.8"
-fastpbkdf2 = "0.1"
 getrandom = "0.2"
 java-rand = "0.2"
+ring = "0.16.20"
 tqdm = "0.4"
 
 [dev-dependencies]

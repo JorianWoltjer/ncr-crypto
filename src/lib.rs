@@ -25,7 +25,7 @@
 //! From reading the Source Code on Github it becomes clear how the mod does encryption:
 //!
 //! 1. You set a passphrase like "secret" in the UI
-//! 2. The mod uses `PBKDF2WithHmacSHA1` with a hardcoded salt and 65536 iterations to make your passphrase
+//! 2. The mod uses `PBKDF2_HMAC_SHA1` with a hardcoded salt and 65536 iterations to make your passphrase
 //! into a hash of 16 bytes. This process takes the longest
 //! 3. An Initialization Vector (IV) is generated from a random nonce value, and used in the encryption that follows
 //! 4. The new hash becomes the key used for encrypting any messages you send with `AES-CFB8` encryption
@@ -39,6 +39,7 @@
 //! 2. Generate the hash from the secret passphrase again, and use it as the key for the AES encryption
 //! 3. If the decrypted message starts with `"#%"`, the rest is printed decrypted in the chat
 
+use std::num::NonZeroU32;
 use std::{
     fmt::Display,
     io::{BufReader, Read},
@@ -47,7 +48,8 @@ use std::{
 
 use aes::cipher::{AsyncStreamCipher, KeyIvInit};
 use bytes::{Buf, BufMut, Bytes, BytesMut};
-use fastpbkdf2::pbkdf2_hmac_sha1;
+use ring::pbkdf2;
+use ring::pbkdf2::PBKDF2_HMAC_SHA1;
 
 type Aes128Cfb8Dec = cfb8::Decryptor<aes::Aes128>;
 type Aes128Cfb8Enc = cfb8::Encryptor<aes::Aes128>;
@@ -69,7 +71,7 @@ pub const SALT: [u8; 16] = [
 
 /// Generate a key from a passphrase
 ///
-/// Use `PBKDF2WithHmacSHA1` with a hardcoded salt and 65536 iterations to hash a passphrase into a 16-byte key
+/// Use `PBKDF2_HMAC_SHA1` with a hardcoded salt and 65536 iterations to hash a passphrase into a 16-byte key
 ///
 /// # Examples
 ///
@@ -86,7 +88,13 @@ pub const SALT: [u8; 16] = [
 /// ```
 pub fn generate_key(passphrase: &[u8]) -> [u8; 16] {
     let mut key = [0; 16];
-    pbkdf2_hmac_sha1(passphrase, &SALT, 65536, &mut key);
+    pbkdf2::derive(
+        PBKDF2_HMAC_SHA1,
+        NonZeroU32::new(65536).unwrap(),
+        &SALT,
+        &passphrase,
+        &mut key,
+    );
 
     key
 }
