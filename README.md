@@ -40,12 +40,4 @@ Decrypting then is very similar, just in reverse:
 ## Windows Performance
 By default `fastpbkdf2` doesn't compile for Windows, [see here](https://github.com/JorianWoltjer/ncr-crypto/issues/2)  
 This crate will use `ring` by default on Windows which is slower than `fastpbkdf2`, [see here](https://github.com/JorianWoltjer/ncr-crypto/pull/3#issuecomment-1379112983)  
-If you're concerned with performance it is recommended to use the Windows Subsystem for Linux.  
-You may manually switch between the two using the `fastpbkdf2` and `ring` features.
-
-```toml
-[ncr-crypto]
-git = "https://github.com/JorianWoltjer/ncr-crypto.git"
-default-features = false
-features = ["ring"]
-```
+If you're concerned with performance it is recommended to use the Windows Subsystem for Linux.
