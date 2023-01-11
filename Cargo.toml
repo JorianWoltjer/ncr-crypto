@@ -12,9 +12,18 @@ repository = "https://github.com/JorianWoltjer/ncr-crypto"
 aes = "0.8"
 bytes = "1"
 cfb8 = "0.8"
+fastpbkdf2 = { version = "0.1.0", optional = true }
 getrandom = "0.2"
 java-rand = "0.2"
-ring = "0.16.20"
+ring = { version = "0.16.20", optional = true }
 
 [dev-dependencies]
 base64 = "0.21.0"
+
+[features]
+default = ["fastpbkdf2"]
+fastpbkdf2 = ["dep:fastpbkdf2"]
+ring = ["dep:ring"]
+
+[target.'cfg(windows)'.features]
+default = ["ring"]

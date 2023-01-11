@@ -50,7 +50,11 @@ use std::{
 
 use aes::cipher::{AsyncStreamCipher, KeyIvInit};
 use bytes::{Buf, BufMut, Bytes, BytesMut};
+#[cfg(feature = "fastpbkdf2")]
+use fastpbkdf2::pbkdf2_hmac_sha1;
+#[cfg(feature = "ring")]
 use ring::pbkdf2;
+#[cfg(feature = "ring")]
 use ring::pbkdf2::PBKDF2_HMAC_SHA1;
 
 type Aes128Cfb8Dec = cfb8::Decryptor<aes::Aes128>;
@@ -91,6 +95,11 @@ pub const SALT: [u8; 16] = [
 /// ```
 pub fn generate_key(passphrase: &[u8]) -> [u8; 16] {
     let mut key = [0; 16];
+
+    #[cfg(feature = "fastpbkdf2")]
+    pbkdf2_hmac_sha1(passphrase, &SALT, 65536, &mut key);
+
+    #[cfg(feature = "ring")]
     pbkdf2::derive(
         PBKDF2_HMAC_SHA1,
         NonZeroU32::new(65536).unwrap(),
