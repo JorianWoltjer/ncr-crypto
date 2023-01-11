@@ -6,13 +6,14 @@
 //! # Examples
 //!
 //! ```
-//! use base64::{alphabet::STANDARD, engine::{GeneralPurpose, GeneralPurposeConfig}, Engine};
-//! use ncr_encryption::{decrypt_with_passphrase, decode_and_verify};
+//! use base64::{alphabet::Alphabet, engine::{GeneralPurpose, GeneralPurposeConfig}, Engine};
+//! use ncr_crypto::{decrypt_with_passphrase, decode_and_verify};
 //!
 //! let passphrase = b"secret";  // Setting in NCR
 //! // "Hello, world!" sent as a message in chat:
-//! let b64 = GeneralPurpose::new(&STANDARD, GeneralPurposeConfig::new());
-//! let ciphertext = b64::decode("q2JCS/M3yMnz+MtXDn4dd6xyqN94Dao=").unwrap();
+//! let alphabet = Alphabet::new("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+\\").unwrap();
+//! let b64 = GeneralPurpose::new(&alphabet, GeneralPurposeConfig::new());
+//! let ciphertext = b64.decode("q2JCS/M3yMnz+MtXDn4dd6xyqN94Dao=").unwrap();
 //!
 //! let decrypted = decrypt_with_passphrase(&ciphertext, passphrase);
 //! let decoded = decode_and_verify(&decrypted);
@@ -40,6 +41,7 @@
 //! 3. If the decrypted message starts with `"#%"`, the rest is printed decrypted in the chat
 
 use std::num::NonZeroU32;
+use std::ptr::invalid;
 use std::{
     fmt::Display,
     io::{BufReader, Read},
@@ -76,15 +78,16 @@ pub const SALT: [u8; 16] = [
 /// # Examples
 ///
 /// ```
-/// use base64::{alphabet::STANDARD, engine::{GeneralPurpose, GeneralPurposeConfig}, Engine};
-/// use ncr_encryption::generate_key;
+/// use base64::{alphabet::Alphabet, engine::{GeneralPurpose, GeneralPurposeConfig}, Engine};
+/// use ncr_crypto::generate_key;
 ///
 /// let passphrase = b"secret";
 ///
 /// let key = generate_key(passphrase);
-/// let b64 = GeneralPurpose::new(&STANDARD, GeneralPurposeConfig::new());
+/// let alphabet = Alphabet::new("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+\\").unwrap();
+/// let b64 = GeneralPurpose::new(&alphabet, GeneralPurposeConfig::new());
 ///
-/// assert_eq!(b64::encode(key), "474esvGYVuN83HpxbK1uFQ==");  // Can be seen in the NCR UI when typing the passphrase
+/// assert_eq!(b64.encode(key), "474esvGYVuN83HpxbK1uFQ==");  // Can be seen in the NCR UI when typing the passphrase
 /// ```
 pub fn generate_key(passphrase: &[u8]) -> [u8; 16] {
     let mut key = [0; 16];
@@ -110,11 +113,12 @@ pub fn generate_key(passphrase: &[u8]) -> [u8; 16] {
 /// # Examples
 ///
 /// ```
-/// use base64::{alphabet::STANDARD, engine::{GeneralPurpose, GeneralPurposeConfig}, Engine};
-/// use ncr_encryption::{encrypt, decrypt};
+/// use base64::{alphabet::Alphabet, engine::{GeneralPurpose, GeneralPurposeConfig}, Engine};
+/// use ncr_crypto::{encrypt, decrypt};
 ///
-/// let b64 = GeneralPurpose::new(&STANDARD, GeneralPurposeConfig::new());
-/// let key = b64::decode("blfrngArk3chG6wzncOZ5A==").unwrap();  // Default key
+/// let alphabet = Alphabet::new("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+\\").unwrap();
+/// let b64 = GeneralPurpose::new(&alphabet, GeneralPurposeConfig::new());
+/// let key = b64.decode("blfrngArk3chG6wzncOZ5A==").unwrap();  // Default key
 /// let key = key.try_into().unwrap();
 /// let plaintext = b"#%Hello, world!";
 ///
@@ -153,12 +157,13 @@ pub fn encrypt(plaintext: &[u8], key: &[u8; 16]) -> Vec<u8> {
 /// # Examples
 ///
 /// ```
-/// use base64::{alphabet::STANDARD, engine::{GeneralPurpose, GeneralPurposeConfig}, Engine};
-/// use ncr_encryption::decrypt;
+/// use base64::{alphabet::Alphabet, engine::{GeneralPurpose, GeneralPurposeConfig}, Engine};
+/// use ncr_crypto::decrypt;
 ///
-/// let b64 = GeneralPurpose::new(&STANDARD, GeneralPurposeConfig::new());
-/// let key = b64::decode("blfrngArk3chG6wzncOZ5A==").unwrap();  // Default key
-/// let ciphertext = b64::decode("NuhaeyIn3WJDHY/W0X++EJKON32pDAA=").unwrap();
+/// let alphabet = Alphabet::new("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+\\").unwrap();
+/// let b64 = GeneralPurpose::new(&alphabet, GeneralPurposeConfig::new());
+/// let key = b64.decode("blfrngArk3chG6wzncOZ5A==").unwrap();  // Default key
+/// let ciphertext = b64.decode("NuhaeyIn3WJDHY/W0X++EJKON32pDAA=").unwrap();
 ///
 /// let decrypted = decrypt(&ciphertext, &key.try_into().unwrap());
 ///
@@ -189,7 +194,7 @@ pub fn decrypt(ciphertext: &[u8], key: &[u8; 16]) -> Vec<u8> {
 /// # Examples
 ///
 /// ```
-/// use ncr_encryption::{encrypt_with_passphrase, decrypt_with_passphrase};
+/// use ncr_crypto::{encrypt_with_passphrase, decrypt_with_passphrase};
 ///
 /// let passphrase = b"secret";
 /// let plaintext = b"#%Hello, world!";
@@ -212,12 +217,13 @@ pub fn encrypt_with_passphrase(plaintext: &[u8], passphrase: &[u8]) -> Vec<u8> {
 /// # Examples
 ///
 /// ```
-/// use base64::{alphabet::STANDARD, engine::{GeneralPurpose, GeneralPurposeConfig}, Engine};
-/// use ncr_encryption::decrypt_with_passphrase;
+/// use base64::{alphabet::Alphabet, engine::{GeneralPurpose, GeneralPurposeConfig}, Engine};
+/// use ncr_crypto::decrypt_with_passphrase;
 ///
-/// let b64 = GeneralPurpose::new(&STANDARD, GeneralPurposeConfig::new());
+/// let alphabet = Alphabet::new("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+\\").unwrap();
+/// let b64 = GeneralPurpose::new(&alphabet, GeneralPurposeConfig::new());
 /// let passphrase = b"secret";
-/// let ciphertext = b64::decode("q2JCS/M3yMnz+MtXDn4dd6xyqN94Dao=").unwrap();
+/// let ciphertext = b64.decode("q2JCS/M3yMnz+MtXDn4dd6xyqN94Dao=").unwrap();
 ///
 /// let decrypted = decrypt_with_passphrase(&ciphertext, passphrase);
 ///
@@ -245,12 +251,13 @@ impl Display for FormatError {
 /// # Examples
 ///
 /// ```
-/// use base64::{alphabet::STANDARD, engine::{GeneralPurpose, GeneralPurposeConfig}, Engine};
-/// use ncr_encryption::{decode_and_verify, decrypt_with_passphrase};
+/// use base64::{alphabet::Alphabet, engine::{GeneralPurpose, GeneralPurposeConfig}, Engine};
+/// use ncr_crypto::{decode_and_verify, decrypt_with_passphrase};
 ///
-/// let b64 = GeneralPurpose::new(&STANDARD, GeneralPurposeConfig::new());
+/// let alphabet = Alphabet::new("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+\\").unwrap();
+/// let b64 = GeneralPurpose::new(&alphabet, GeneralPurposeConfig::new());
 /// let passphrase = b"secret";
-/// let ciphertext = b64::decode("q2JCS/M3yMnz+MtXDn4dd6xyqN94Dao=").unwrap();
+/// let ciphertext = b64.decode("q2JCS/M3yMnz+MtXDn4dd6xyqN94Dao=").unwrap();
 ///
 /// let decrypted = decrypt_with_passphrase(&ciphertext, passphrase);
 /// let decoded = decode_and_verify(&decrypted);
@@ -259,10 +266,13 @@ impl Display for FormatError {
 /// ```
 ///
 /// ```
-/// use ncr_encryption::{decode_and_verify, decrypt_with_passphrase, FormatError};
+/// use base64::{alphabet::Alphabet, engine::{GeneralPurpose, GeneralPurposeConfig}, Engine};
+/// use ncr_crypto::{decode_and_verify, decrypt_with_passphrase, FormatError};
 ///
+/// let alphabet = Alphabet::new("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+\\").unwrap();
+/// let b64 = GeneralPurpose::new(&alphabet, GeneralPurposeConfig::new());
 /// let passphrase = b"wrong";  // Should be "secret"
-/// let ciphertext = base64::decode("q2JCS/M3yMnz+MtXDn4dd6xyqN94Dao=").unwrap();
+/// let ciphertext = b64.decode("q2JCS/M3yMnz+MtXDn4dd6xyqN94Dao=").unwrap();
 ///
 /// let decrypted = decrypt_with_passphrase(&ciphertext, passphrase);
 /// let decoded = decode_and_verify(&decrypted);
@@ -271,7 +281,7 @@ impl Display for FormatError {
 /// ```
 ///
 /// ```
-/// use ncr_encryption::{decode_and_verify, FormatError};
+/// use ncr_crypto::{decode_and_verify, FormatError};
 ///
 /// let bytes = b"Hello, world!";  // Without "#%" prefix
 /// let decoded = decode_and_verify(bytes);
