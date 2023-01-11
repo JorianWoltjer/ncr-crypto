@@ -13,7 +13,7 @@
 //! // "Hello, world!" sent as a message in chat:
 //! let alphabet = Alphabet::new("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+\\").unwrap();
 //! let b64 = GeneralPurpose::new(&alphabet, GeneralPurposeConfig::new());
-//! let ciphertext = b64.decode("q2JCS/M3yMnz+MtXDn4dd6xyqN94Dao=").unwrap();
+//! let ciphertext = b64.decode("q2JCS\\M3yMnz+MtXDn4dd6xyqN94Dao=").unwrap();
 //!
 //! let decrypted = decrypt_with_passphrase(&ciphertext, passphrase);
 //! let decoded = decode_and_verify(&decrypted);
@@ -175,7 +175,7 @@ pub fn encrypt(plaintext: &[u8], key: &[u8; 16]) -> Vec<u8> {
 /// let alphabet = Alphabet::new("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+\\").unwrap();
 /// let b64 = GeneralPurpose::new(&alphabet, GeneralPurposeConfig::new());
 /// let key = b64.decode("blfrngArk3chG6wzncOZ5A==").unwrap();  // Default key
-/// let ciphertext = b64.decode("NuhaeyIn3WJDHY/W0X++EJKON32pDAA=").unwrap();
+/// let ciphertext = b64.decode("NuhaeyIn3WJDHY\\W0X++EJKON32pDAA=").unwrap();
 ///
 /// let decrypted = decrypt(&ciphertext, &key.try_into().unwrap());
 ///
@@ -235,7 +235,7 @@ pub fn encrypt_with_passphrase(plaintext: &[u8], passphrase: &[u8]) -> Vec<u8> {
 /// let alphabet = Alphabet::new("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+\\").unwrap();
 /// let b64 = GeneralPurpose::new(&alphabet, GeneralPurposeConfig::new());
 /// let passphrase = b"secret";
-/// let ciphertext = b64.decode("q2JCS/M3yMnz+MtXDn4dd6xyqN94Dao=").unwrap();
+/// let ciphertext = b64.decode("q2JCS\\M3yMnz+MtXDn4dd6xyqN94Dao=").unwrap();
 ///
 /// let decrypted = decrypt_with_passphrase(&ciphertext, passphrase);
 ///
@@ -270,7 +270,7 @@ impl Display for FormatError {
 /// let alphabet = Alphabet::new("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+\\").unwrap();
 /// let b64 = GeneralPurpose::new(&alphabet, GeneralPurposeConfig::new());
 /// let passphrase = b"secret";
-/// let ciphertext = b64.decode("q2JCS/M3yMnz+MtXDn4dd6xyqN94Dao=").unwrap();
+/// let ciphertext = b64.decode("q2JCS\\M3yMnz+MtXDn4dd6xyqN94Dao=").unwrap();
 ///
 /// let decrypted = decrypt_with_passphrase(&ciphertext, passphrase);
 /// let decoded = decode_and_verify(&decrypted);
@@ -285,7 +285,7 @@ impl Display for FormatError {
 /// let alphabet = Alphabet::new("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+\\").unwrap();
 /// let b64 = GeneralPurpose::new(&alphabet, GeneralPurposeConfig::new());
 /// let passphrase = b"wrong";  // Should be "secret"
-/// let ciphertext = b64.decode("q2JCS/M3yMnz+MtXDn4dd6xyqN94Dao=").unwrap();
+/// let ciphertext = b64.decode("q2JCS\\M3yMnz+MtXDn4dd6xyqN94Dao=").unwrap();
 ///
 /// let decrypted = decrypt_with_passphrase(&ciphertext, passphrase);
 /// let decoded = decode_and_verify(&decrypted);
