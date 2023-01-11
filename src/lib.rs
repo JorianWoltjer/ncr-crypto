@@ -40,11 +40,12 @@
 //! 2. Generate the hash from the secret passphrase again, and use it as the key for the AES encryption
 //! 3. If the decrypted message starts with `"#%"`, the rest is printed decrypted in the chat
 
-use std::num::NonZeroU32;
-use std::ptr::invalid;
 use std::{
+    error::Error,
     fmt::Display,
     io::{BufReader, Read},
+    num::NonZeroU32,
+    ptr::invalid,
     str::from_utf8,
 };
 
@@ -237,6 +238,7 @@ pub fn decrypt_with_passphrase(ciphertext: &[u8], passphrase: &[u8]) -> Vec<u8> 
 #[derive(Debug, Clone, PartialEq)]
 pub struct FormatError;
 
+impl Error for FormatError {}
 impl Display for FormatError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "string did not start with '#%' or is invalid UTF8")
