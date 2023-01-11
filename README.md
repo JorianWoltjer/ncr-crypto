@@ -3,7 +3,7 @@
 The cryptography used to generate passwords and encrypted messages
 exactly as the [No Chat Reports](https://github.com/Aizistral-Studios/No-Chat-Reports) Mod for Minecraft does.
 
-# Example
+## Example
 
 ```Rust
 use ncr_encryption::{decrypt_with_passphrase, decode_and_verify};
@@ -18,7 +18,7 @@ let decoded = decode_and_verify(&decrypted);
 assert_eq!(decoded, Ok("#%Hello, world!"))
 ```
 
-# How it works
+## How it works
 
 From reading the Source Code on Github it becomes clear how the mod does encryption:
 
@@ -36,3 +36,16 @@ Decrypting then is very similar, just in reverse:
 2. Get the nonce from the message and generate the IV again with it
 2. Generate the hash from the secret passphrase again, and use it as the key for the AES encryption
 3. If the decrypted message starts with `"#%"`, the rest is printed decrypted in the chat
+
+## Windows Performance
+By default `fastpbkdf2` doesn't compile for Windows, [see here](https://github.com/JorianWoltjer/ncr-crypto/issues/2)  
+This crate will use `ring` by default on Windows which is slower than `fastpbkdf2`, [see here](https://github.com/JorianWoltjer/ncr-crypto/pull/3#issuecomment-1379112983)  
+If you're concerned with performance it is recommended to use the Windows Subsystem for Linux.  
+You may manually switch between the two using the `fastpbkdf2` and `ring` features.
+
+```toml
+[ncr-crypto]
+git = "https://github.com/JorianWoltjer/ncr-crypto.git"
+default-features = false
+features = ["ring"]
+```
