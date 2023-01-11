@@ -45,7 +45,6 @@ use std::{
     fmt::Display,
     io::{BufReader, Read},
     num::NonZeroU32,
-    ptr::invalid,
     str::from_utf8,
 };
 
