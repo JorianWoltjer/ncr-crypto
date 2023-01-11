@@ -2,19 +2,24 @@
 name = "ncr-crypto"
 description = "A library for the cryptography used in the Minecraft No-Chat-Reports Mod"
 license = "MIT"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 repository = "https://github.com/JorianWoltjer/ncr-crypto"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+aes = "0.8"
 bytes = "1"
+cfb8 = "0.8"
 getrandom = "0.2"
 java-rand = "0.2"
-fastpbkdf2 = "0.1"
-base64 = "0.13"
-aes = "0.8"
-cfb8 = "0.8"
-tqdm = "0.4"
-bruteforce = "0.2"
+
+[target.'cfg(not(windows))'.dependencies]
+fastpbkdf2 = "0.1.0"
+
+[target.'cfg(windows)'.dependencies]
+ring = "0.16.20"
+
+[dev-dependencies]
+base64 = "0.21.0"
